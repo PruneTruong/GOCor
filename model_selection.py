@@ -115,7 +115,7 @@ def select_model(model_name, pre_trained_model_type, global_optim_iter, local_op
     '''
     to plot GOCor weights
     if model_name == 'GLUNet_GOCor':
-        network.corr.corr_module.filter_optimizer._plot_weights(save_dir='/scratch_net/pelle/truongp/code/GOCor_clean')
-        network.local_corr.filter_optimizer._plot_weights(save_dir='/scratch_net/pelle/truongp/code/GOCor_clean')
+        network.corr.corr_module.filter_optimizer._plot_weights(save_dir='evaluation/')
+        network.local_corr.filter_optimizer._plot_weights(save_dir='evaluation/')
     '''
     return network
