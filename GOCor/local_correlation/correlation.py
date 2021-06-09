@@ -284,8 +284,8 @@ class _FunctionCorrelation(torch.autograd.Function):
 
         self.save_for_backward(first, second, rbot0, rbot1)
 
-        assert (first.is_contiguous() == True)
-        assert (second.is_contiguous() == True)
+        first = first.contiguous()
+        second = second.contiguous()
 
         output = first.new_zeros([first.size(0), 81, first.size(2), first.size(3)])
 
@@ -334,7 +334,7 @@ class _FunctionCorrelation(torch.autograd.Function):
     def backward(self, gradOutput):
         first, second, rbot0, rbot1 = self.saved_tensors
 
-        assert (gradOutput.is_contiguous() == True)
+        gradOutput = gradOutput.contiguous()
 
         gradFirst = first.new_zeros([first.size(0), first.size(1), first.size(2), first.size(3)]) if \
         self.needs_input_grad[0] == True else None
@@ -394,8 +394,8 @@ class _FunctionCorrelationTranspose(torch.autograd.Function):
 
         self.save_for_backward(input, second, rbot0, rbot1)
 
-        assert (input.is_contiguous() == True)
-        assert (second.is_contiguous() == True)
+        input = input.contiguous()
+        second = second.contiguous()
 
         output = second.new_zeros([second.size(0), second.size(1), second.size(2), second.size(3)])
 
@@ -437,7 +437,7 @@ class _FunctionCorrelationTranspose(torch.autograd.Function):
     def backward(self, gradOutput):
         input, second, rbot0, rbot1 = self.saved_tensors
 
-        assert (gradOutput.is_contiguous() == True)
+        gradOutput = gradOutput.contiguous()
 
         gradInput = input.new_zeros([input.size(0), input.size(1), input.size(2), input.size(3)]) if \
         self.needs_input_grad[0] == True else None
@@ -495,25 +495,25 @@ class _FunctionCorrelationTranspose(torch.autograd.Function):
         return gradInput, gradSecond
 
 
-def FunctionCorrelation(tensorFirst, tensorSecond):
-    return _FunctionCorrelation.apply(tensorFirst, tensorSecond)
+def FunctionCorrelation(reference_features, query_features):
+    return _FunctionCorrelation.apply(reference_features, query_features)
 
 
 class ModuleCorrelation(torch.nn.Module):
     def __init__(self):
         super(ModuleCorrelation, self).__init__()
 
-    def forward(self, tensorFirst, tensorSecond):
-        return _FunctionCorrelation.apply(tensorFirst, tensorSecond)
+    def forward(self, reference_features, query_features):
+        return _FunctionCorrelation.apply(reference_features, query_features)
 
 
-def FunctionCorrelationTranspose(tensorFirst, tensorSecond):
-    return _FunctionCorrelationTranspose.apply(tensorFirst, tensorSecond)
+def FunctionCorrelationTranspose(reference_features, query_features):
+    return _FunctionCorrelationTranspose.apply(reference_features, query_features)
 
 
 class ModuleCorrelationTranspose(torch.nn.Module):
     def __init__(self):
         super(ModuleCorrelationTranspose, self).__init__()
 
-    def forward(self, tensorFirst, tensorSecond):
-        return _FunctionCorrelationTranspose.apply(tensorFirst, tensorSecond)
+    def forward(self, reference_features, query_features):
+        return _FunctionCorrelationTranspose.apply(reference_features, query_features)
