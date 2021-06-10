@@ -7,11 +7,11 @@ Jinwei Gu and Zhile Ren
 
 import torch
 import torch.nn as nn
+import numpy as np
+from .base_net import BasePWCNet, conv, deconv, predict_flow
 from GOCor import local_gocor
 from GOCor.optimizer_selection_functions import define_optimizer_local_corr
 from GOCor.local_correlation import correlation
-import numpy as np
-from .base_net import BasePWCNet, conv, deconv, predict_flow
 
 
 class PWCNet_model(BasePWCNet):
@@ -167,7 +167,7 @@ class PWCNet_model(BasePWCNet):
             else:
                 corr6 = self.local_corr_6(c16, c26)
         else:
-            corr6 = correlation.FunctionCorrelation(reference_features=c16, query_features=c26)
+            corr6 = correlation.FunctionCorrelation(tensorFirst=c16, tensorSecond=c26)
         corr6 = self.leakyRELU(corr6)
 
         # decoder 6
@@ -188,7 +188,7 @@ class PWCNet_model(BasePWCNet):
             else:
                 corr5 = self.local_corr_5(c15, warp5)
         else:
-            corr5 = correlation.FunctionCorrelation(reference_features=c15, query_features=warp5)
+            corr5 = correlation.FunctionCorrelation(tensorFirst=c15, tensorSecond=warp5)
         corr5 = self.leakyRELU(corr5)
         x = torch.cat((corr5, c15, up_flow6, up_feat6), 1)
         x = torch.cat((self.conv5_0(x), x), 1)
@@ -208,7 +208,7 @@ class PWCNet_model(BasePWCNet):
             else:
                 corr4 = self.local_corr_4(c14, warp4)
         else:
-            corr4 = correlation.FunctionCorrelation(reference_features=c14, query_features=warp4)
+            corr4 = correlation.FunctionCorrelation(tensorFirst=c14, tensorSecond=warp4)
         corr4 = self.leakyRELU(corr4)
         x = torch.cat((corr4, c14, up_flow5, up_feat5), 1)
         x = torch.cat((self.conv4_0(x), x), 1)
@@ -228,7 +228,7 @@ class PWCNet_model(BasePWCNet):
             else:
                 corr3 = self.local_corr_3(c13, warp3)
         else:
-            corr3 = correlation.FunctionCorrelation(reference_features=c13, query_features=warp3)
+            corr3 = correlation.FunctionCorrelation(tensorFirst=c13, tensorSecond=warp3)
         corr3 = self.leakyRELU(corr3)
 
         x = torch.cat((corr3, c13, up_flow4, up_feat4), 1)
@@ -249,7 +249,7 @@ class PWCNet_model(BasePWCNet):
             else:
                 corr2 = self.local_corr_2(c12, warp2)
         else:
-            corr2 = correlation.FunctionCorrelation(reference_features=c12, query_features=warp2)
+            corr2 = correlation.FunctionCorrelation(tensorFirst=c12, tensorSecond=warp2)
         corr2 = self.leakyRELU(corr2)
         x = torch.cat((corr2, c12, up_flow3, up_feat3), 1)
         x = torch.cat((self.conv2_0(x), x), 1)

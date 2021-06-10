@@ -2,14 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from GOCor.global_gocor_modules import GlobalGOCorWithFlexibleContextAwareInitializer
-from models.modules.consensus_network_modules import MutualMatching, NeighConsensus, FeatureCorrelation
-from models.modules.mod import conv, predict_flow
-from models.modules.feature_correlation_layer import FeatureL2Norm, GlobalFeatureCorrelationLayer
+import math
+from ..modules.consensus_network_modules import MutualMatching, NeighConsensus, FeatureCorrelation
+from ..modules.mod import conv, predict_flow
+from ..modules.feature_correlation_layer import FeatureL2Norm, GlobalFeatureCorrelationLayer
+from ..modules.matching_modules import initialize_flow_decoder_, initialize_mapping_decoder_
 from GOCor import local_gocor
 from GOCor.optimizer_selection_functions import define_optimizer_local_corr
-from models.modules.matching_modules import initialize_flow_decoder_, initialize_mapping_decoder_
-import math
+from GOCor.global_gocor_modules import GlobalGOCorWithFlexibleContextAwareInitializer
 
 
 def pre_process_data_GLUNet(source_img, target_img, device, mean_vector=[0.485, 0.456, 0.406],

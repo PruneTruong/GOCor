@@ -1,5 +1,5 @@
 import numpy as np
-from utils_flow.pixel_wise_mapping import remap_using_correspondence_map
+from .pixel_wise_mapping import remap_using_correspondence_map
 import torch
 
 

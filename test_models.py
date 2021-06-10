@@ -3,10 +3,11 @@ import torch
 import argparse
 import imageio
 from matplotlib import pyplot as plt
-from utils_flow.pixel_wise_mapping import remap_using_flow_fields
 import cv2
+from utils_flow.pixel_wise_mapping import remap_using_flow_fields
 from model_selection import select_model
 from utils_flow.util_optical_flow import flow_to_image
+
 
 def pad_to_same_shape(im1, im2):
     # pad to same shape both images with zero

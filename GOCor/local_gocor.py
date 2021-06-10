@@ -15,11 +15,11 @@
 import math
 import torch
 import torch.nn as nn
-import GOCor.activation as activation
-from GOCor.distance import DistanceMap
+from . import activation as activation
+from .distance import DistanceMap
 from .local_correlation.correlation import FunctionCorrelation, FunctionCorrelationTranspose
 from .plot_corr import plot_local_gocor_weights
-import GOCor.fourdim as fourdim
+from . import fourdim as fourdim
 
 
 class LocalCorrInitializerZeros(nn.Module):

@@ -1,4 +1,4 @@
-from models.modules.mod import OpticalFlowEstimator,  OpticalFlowEstimatorNoDenseConnection, CMDTop
+from .mod import OpticalFlowEstimator,  OpticalFlowEstimatorNoDenseConnection, CMDTop
 import numpy as np
 
 

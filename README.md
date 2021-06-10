@@ -59,8 +59,7 @@ If our project is helpful for your research, please consider citing :
  
 # 1. Installation <a name="Installation"></a>
 
-Note that the models were trained with **torch 1.0**. Torch versions up to 1.7 were tested for inference but NOT for training, 
-so I cannot guarantee that the models train smoothly for higher torch versions. 
+Inference runs for torch >= 1.0. 
 
 
 * Create and activate conda environment with Python 3.x
@@ -71,9 +70,8 @@ conda activate GOCor_env
 ```
 
 * Install all dependencies (except for cupy, see below) by running the following command:
-
 ```bash
-pip install -r requirements.txt
+pip install torch torchvision imageio matplotlib numpy opencv-python pandas 
 ```
 
 **Note**: CUDA is required to run the code. Indeed, the correlation layer is implemented in CUDA using CuPy, 

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from GOCor import global_gocor
-from GOCor import global_corr_initializer
+from . import global_gocor
+from . import global_corr_initializer
 import torch.nn as nn
-from GOCor.optimizer_selection_functions import define_optimizer_global_corr
+from .optimizer_selection_functions import define_optimizer_global_corr
 
 
 class GlobalGOCorWithSimpleInitializer(nn.Module):

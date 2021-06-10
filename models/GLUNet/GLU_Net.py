@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from models.modules.mod import deconv, unnormalise_and_convert_mapping_to_flow
-from models.GLUNet.base_matching_net import BaseGLUMultiScaleMatchingNet
-from models.GLUNet.base_matching_net import set_glunet_parameters
-from models.feature_backbones.VGG_features import VGGPyramid
+from ..modules.mod import deconv, unnormalise_and_convert_mapping_to_flow
+from .base_matching_net import BaseGLUMultiScaleMatchingNet
+from .base_matching_net import set_glunet_parameters
+from ..feature_backbones.VGG_features import VGGPyramid
 from utils_flow.flow_and_mapping_operations import convert_mapping_to_flow, convert_flow_to_mapping
 from GOCor.local_correlation import correlation
 

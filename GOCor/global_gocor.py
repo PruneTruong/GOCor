@@ -16,9 +16,9 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from GOCor import filter_layer
-import GOCor.activation as activation
-import GOCor.fourdim as fourdim
+from . import filter_layer
+from . import activation as activation
+from . import fourdim as fourdim
 from .plot_corr import plot_global_gocor_weights
 from .distance import DistanceMap
 
