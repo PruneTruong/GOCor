@@ -73,13 +73,21 @@ class GlobalGOCorOpt(nn.Module):
         # for the reference loss L_r
         self.distance_map = DistanceMap(num_dist_bins, bin_displacement)
 
-        # distance coordinates
+        # distance coordinates ==> represents the distance covered by the bins.
         d = torch.arange(num_dist_bins, dtype=torch.float32).view(1, -1, 1, 1) * bin_displacement
+        # dim is is (1, num_bins, 1, 1) = (output, input, kernel_x, kernel_y), it corresponds to dimension of
+        # the weights of the label_map_predictor, spatial_weight_predictor and weight_m_predictor
 
+        # the label_map_predictor, spatial_weight_predictor and weight_m_predictor takes the bin values
+        # for a particular pixel as input (corresponding to the distance histogram) and
+        # computes the values y, v+ and v- for that location.
         # initialize the label map predictor y'_theta
         if init_gauss_sigma == 0:
             init_gauss = torch.zeros_like(d)
             init_gauss[0, 0, 0, 0] = 1
+            # the target_map will be an identity matrix. only takes into consideration the first bin. ==> if the pixel
+            # is at a distance corresponding to the first bin, the first bin will have value 1, the output will then
+            # be 1, otherwise 0.
         else:
             init_gauss = torch.exp(-1 / 2 * (d / init_gauss_sigma) ** 2)
         self.init_gauss = init_gauss  # for plotting
@@ -92,6 +100,8 @@ class GlobalGOCorOpt(nn.Module):
                 param.requires_grad = False
 
         # initialize the weight v_plus predictor, here called spatial_weight_predictor
+        # here, we initialize the weight to a constant of 1. This means that irrespective of the distance (and thus
+        # of the histogram/bin distribution), the output will be 1
         self.spatial_weight_predictor = nn.Conv2d(num_dist_bins, 1, kernel_size=1, bias=False)
         self.spatial_weight_predictor.weight.data.fill_(1.0)
 
@@ -158,18 +168,30 @@ class GlobalGOCorOpt(nn.Module):
         filter_sz = (filter_map.shape[-2], filter_map.shape[-1])  # (fH, fW) filter size
         feat_sz = (reference_feat.shape[-2], reference_feat.shape[-1])  # (H, W)
         output_sz = (feat_sz[0] + (filter_sz[0] + 1) % 2, feat_sz[1] + (filter_sz[1] + 1) % 2)
+        # (H, W) because filter size is 1
 
         assert num_images == 1
         assert num_filters == reference_feat.shape[-2] * reference_feat.shape[-1]
         assert filter_sz[0] % 2 == 1 and filter_sz[1] % 2 == 1  # Assume odd kernels for now
 
         # Compute distance map
-        dist_map_sz = (output_sz[0] * 2 - 1, output_sz[1] * 2 - 1)
+        dist_map_sz = (output_sz[0] * 2 - 1, output_sz[1] * 2 - 1)  # (H*2-1, W*2-1)
         center = torch.Tensor([dist_map_sz[0] // 2, dist_map_sz[1] // 2]).to(reference_feat.device)
-        dist_map = self.distance_map(center, dist_map_sz)
+        # at half of the dist_map_sz
+
+        # This first creates a distance map (euclidian distance) from the center point. Then computes the bin values
+        # for each of the pixel (corresponding to the distance). For each pixel, the bin values correspond
+        # to a histogram of where the distance is (the bin values for each pixel must sum to 1).
+        dist_map = self.distance_map(center, dist_map_sz)  # shape is (1, num_bins, dist_map_sz[0], dist_map_sz[1])
 
         # Compute target map, weights v_plus and weight_m (used in v_minus), used for reference loss
+        # first apply the predictor to the dist map, reduces the num_bins dimension to a single value.
+        # This corresponds to predicting the v+, m or y based on the distance, because all these functions are
+        # parametrized as triangular basis function.
+        # ex after self.label_map_predictor(dist_map), shape is (1, 1, dist_map_sz[0], dist_map_sz[1])
         target_map = self._unfold_map(self.label_map_predictor(dist_map))
+        # after unfold, shape is (1, 1, H*W, H, W). if gauss is 0, this is basically an identity at initialization
+
         v_plus = self._unfold_map(self.spatial_weight_predictor(dist_map))
         weight_m = self._unfold_map(self.target_mask_predictor(dist_map))
 

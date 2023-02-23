@@ -18,7 +18,9 @@ import torch.nn.functional as F
 
 
 class DistanceMap(nn.Module):
-    """DistanceMap
+    """DistanceMap. Creates distance map (euclidian distance) from the center point. Then computes the bin values
+    for each of the pixel (corresponding to the distance). For each pixel, the bin values correspond
+    to a histogram of where the distance is (the bin values for each pixel must sum to 1).
     """
     def __init__(self, num_bins, bin_displacement=1.0):
         super().__init__()
@@ -50,6 +52,6 @@ class DistanceMap(nn.Module):
         bin_val = torch.cat((F.relu(1.0 - torch.abs(bin_diff[:, :-1, :, :]), inplace=True),
                              (1.0 + bin_diff[:, -1:, :, :]).clamp(0, 1)), dim=1)
 
-        return bin_val
+        return bin_val  # shape is (1, num_bins, output_sz[0], output_sz[1])
 
 
